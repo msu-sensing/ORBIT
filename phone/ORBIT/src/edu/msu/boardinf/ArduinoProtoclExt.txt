@@ -1,0 +1,43 @@
+// This is a part of decompose message need to be modified with new "Message " structure and put it back
+
+case MessageType.SEND_SAMPLES :
+					
+					int numOfSamples = recviedMessage[2]; //(int) byteArrayToInt(recviedMessage, 2, 1);
+					Message.numOfreading = numOfSamples;
+					
+					Message.reading3D = new Data3D[numOfSamples];
+					
+					for(int j=0; j<numOfSamples; j++) {
+						
+						Message.reading3D[j] = new Data3D();
+						
+						Message.reading3D[j].setTime(
+								byteArrayToTime(recviedMessage, 
+								3 + j*numOfByteForReading_total, numOfByteForTime));
+												
+						int[] XYZValues = 
+							{(int) byteArrayToInt(recviedMessage, 
+								3 + numOfByteForTime + j*numOfByteForReading_total, 
+								numOfByteFor1DReading),
+							(int) byteArrayToInt(recviedMessage, 
+								3 + numOfByteForTime + numOfByteFor1DReading + j*numOfByteForReading_total, 
+								numOfByteFor1DReading),
+							(int) byteArrayToInt(recviedMessage, 
+								3 + numOfByteForTime + 2*numOfByteFor1DReading + j*numOfByteForReading_total, 
+								numOfByteFor1DReading)};
+						
+						Message.reading3D[j].setValues(XYZValues); 
+					}
+					debugMessage = " \n got readings3D ";
+
+					break;
+				
+			case MessageType.REPORT_STATUS :
+					Message.debug = (recviedMessage[2] & 1) != 0;
+					Message.sampling = (recviedMessage[2] & 2) !=0;
+					Message.samplingPeriod = byteArrayToInt(recviedMessage,3, 4);
+					break;
+					
+			case MessageType.REPORT_SAMPLES :
+					Message.numOfreading = (int) byteArrayToInt(recviedMessage,2, 2);
+					break;	
